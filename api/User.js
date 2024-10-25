@@ -97,7 +97,7 @@ router.post('/signup', (req, res) => {
 })
 
 // Login route
-router.post('/signin', (req, res) => {
+router.get('/signin', (req, res) => {
     let {email, password} = req.body;
     email = email.trim();
     password = password.trim();
