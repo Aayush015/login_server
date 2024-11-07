@@ -1,6 +1,3 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-
 const LostAndFoundItemSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
@@ -38,6 +35,11 @@ const LostAndFoundItemSchema = new Schema({
     dateReported: {
         type: Date,
         default: Date.now
+    },
+    status: {  // New field to track if the item is lost or found
+        type: String,
+        enum: ['lost', 'found'],
+        required: true
     }
 });
 
