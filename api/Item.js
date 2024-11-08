@@ -101,7 +101,6 @@ function calculateMatchScore(lostItem, foundItem) {
     return score;
 }
 
-// Route for fetching history of a specific user
 // Route to get the history of reported lost and found items by user ID
 router.get('/history/:userId', async (req, res) => {
     try {
@@ -115,5 +114,18 @@ router.get('/history/:userId', async (req, res) => {
     }
 });
 
+// Route to delete a specific lost and found item
+router.delete('/:itemId', async (req, res) => {
+    try {
+        const deletedItem = await LostAndFoundItem.findByIdAndDelete(req.params.itemId);
+        if (deletedItem) {
+            res.status(200).json({ message: 'Item deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Item not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
 
 module.exports = router;
