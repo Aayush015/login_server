@@ -150,4 +150,29 @@ router.post('/signin', (req, res) => {
     }
 })
 
+// Get user details by user ID
+router.get('/:userId', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId, 'name email'); // Retrieve only name and email
+        if (user) {
+            res.json({
+                status: 'SUCCESS',
+                message: 'User found',
+                data: user
+            });
+        } else {
+            res.json({
+                status: 'FAILED',
+                message: 'User not found'
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.json({
+            status: 'FAILED',
+            message: 'An error occurred while fetching user details'
+        });
+    }
+});
+
 module.exports = router;
