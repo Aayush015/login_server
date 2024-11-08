@@ -128,4 +128,18 @@ router.delete('/delete/:itemId', async (req, res) => {
     }
 });
 
+// Route to get chat history for a specific item
+router.get('/chat/:itemId', async (req, res) => {
+    try {
+        const chatHistory = await Chat.find({ itemId: req.params.itemId })
+            .sort({ timestamp: 1 })
+            .populate('senderId', 'name')
+            .populate('receiverId', 'name');
+        
+        res.status(200).json(chatHistory);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
 module.exports = router;
