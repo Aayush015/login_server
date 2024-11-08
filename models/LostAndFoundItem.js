@@ -44,7 +44,7 @@ const LostAndFoundItemSchema = new Schema({
         enum: ['lost', 'found'],
         required: true
     }
-});
+}, {timestamps: true});
 
 function arrayLimit(val) {
     return val.length <= 3;

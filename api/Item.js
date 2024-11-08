@@ -38,6 +38,7 @@ router.post('/report', async (req, res) => {
     }
 });
 
+// Route for fetching potential matches
 router.get('/potentialMatches/:userId', async (req, res) => {
     try {
         // Fetch only lost items reported by the current user and populate the user details
@@ -99,5 +100,20 @@ function calculateMatchScore(lostItem, foundItem) {
 
     return score;
 }
+
+// Route for fetching history of a specific user
+// Route to get the history of reported lost and found items by user ID
+router.get('/history/:userId', async (req, res) => {
+    try {
+        const items = await LostAndFoundItem.find({ userId: req.params.userId })
+            .sort({ createdAt: -1 }) // Sort by most recent first
+            .populate('userId', 'name'); // Include user name if needed
+
+        res.status(200).json(items);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
 
 module.exports = router;
