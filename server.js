@@ -17,10 +17,6 @@ app.use(express.json());
 app.use('/user', UserRouter);
 app.use('/item', ItemRouter);
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
-
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
@@ -49,6 +45,7 @@ io.on('connection', (socket) => {
     });
 });
 
+// Keep only this line for starting the server
 server.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
