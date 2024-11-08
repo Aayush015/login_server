@@ -40,8 +40,8 @@ router.post('/report', async (req, res) => {
 
 router.get('/potentialMatches/:userId', async (req, res) => {
     try {
-        // Fetch only lost items reported by the current user
-        const lostItems = await LostAndFoundItem.find({ userId: req.params.userId, status: 'lost' });
+        // Fetch only lost items reported by the current user and populate the user details
+        const lostItems = await LostAndFoundItem.find({ userId: req.params.userId, status: 'lost' }).populate('userId', 'name');
 
         // Fetch only found items reported by other users
         const foundItems = await LostAndFoundItem.find({ userId: { $ne: req.params.userId }, status: 'found' });
@@ -54,7 +54,12 @@ router.get('/potentialMatches/:userId', async (req, res) => {
 
                 // Assuming a threshold for similarity (e.g., matchScore > 0.6)
                 if (matchScore > 0.6) {
-                    matches.push({ lostItem, foundItem, matchScore });
+                    matches.push({
+                        lostItem,
+                        foundItem,
+                        matchScore,
+                        lostItemUserName: lostItem.userId.name // Include user's name who reported lost item
+                    });
                 }
             });
         });
