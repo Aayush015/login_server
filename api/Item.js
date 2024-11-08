@@ -115,7 +115,7 @@ router.get('/history/:userId', async (req, res) => {
 });
 
 // Route to delete a specific lost and found item
-router.delete('delete/:itemId', async (req, res) => {
+router.delete('/delete/:itemId', async (req, res) => {
     try {
         const deletedItem = await LostAndFoundItem.findByIdAndDelete(req.params.itemId);
         if (deletedItem) {
