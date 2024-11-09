@@ -38,28 +38,48 @@ router.post('/report', async (req, res) => {
     }
 });
 
-// Route for fetching potential matches
+// Route for fetching potential matches for both lost and found items
 router.get('/potentialMatches/:userId', async (req, res) => {
     try {
-        // Fetch only lost items reported by the current user and populate the user details
-        const lostItems = await LostAndFoundItem.find({ userId: req.params.userId, status: 'lost' }).populate('userId', 'name');
+        const userId = req.params.userId;
 
-        // Fetch only found items reported by other users
-        const foundItems = await LostAndFoundItem.find({ userId: { $ne: req.params.userId }, status: 'found' });
+        // Fetch lost items reported by the user and found items by others
+        const lostItems = await LostAndFoundItem.find({ userId, status: 'lost' }).populate('userId', 'name');
+        const foundItemsByOthers = await LostAndFoundItem.find({ userId: { $ne: userId }, status: 'found' });
+
+        // Fetch found items reported by the user and lost items by others
+        const foundItems = await LostAndFoundItem.find({ userId, status: 'found' }).populate('userId', 'name');
+        const lostItemsByOthers = await LostAndFoundItem.find({ userId: { $ne: userId }, status: 'lost' });
 
         const matches = [];
 
+        // Match user-reported lost items with found items from others
         lostItems.forEach((lostItem) => {
-            foundItems.forEach((foundItem) => {
+            foundItemsByOthers.forEach((foundItem) => {
                 const matchScore = calculateMatchScore(lostItem, foundItem);
-
-                // Assuming a threshold for similarity (e.g., matchScore > 0.6)
                 if (matchScore > 0.6) {
                     matches.push({
                         lostItem,
                         foundItem,
                         matchScore,
-                        lostItemUserName: lostItem.userId.name // Include user's name who reported lost item
+                        lostItemUserName: lostItem.userId.name,
+                        foundItemUserName: foundItem.userId.name
+                    });
+                }
+            });
+        });
+
+        // Match user-reported found items with lost items from others
+        foundItems.forEach((foundItem) => {
+            lostItemsByOthers.forEach((lostItem) => {
+                const matchScore = calculateMatchScore(lostItem, foundItem);
+                if (matchScore > 0.6) {
+                    matches.push({
+                        lostItem,
+                        foundItem,
+                        matchScore,
+                        lostItemUserName: lostItem.userId.name,
+                        foundItemUserName: foundItem.userId.name
                     });
                 }
             });
@@ -70,36 +90,6 @@ router.get('/potentialMatches/:userId', async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 });
-
-// Helper function to calculate a similarity score between two items
-function calculateMatchScore(lostItem, foundItem) {
-    let score = 0;
-
-    // Check item type
-    if (lostItem.itemType === foundItem.itemType) score += 0.4;
-
-    // Check known location
-    if (
-        lostItem.locationKnown &&
-        foundItem.locationKnown &&
-        lostItem.knownLocation === foundItem.knownLocation
-    ) {
-        score += 0.3;
-    }
-
-    // Check distinguishing features for similarity (simple substring match)
-    if (
-        lostItem.distinguishingFeatures &&
-        foundItem.distinguishingFeatures &&
-        lostItem.distinguishingFeatures
-            .toLowerCase()
-            .includes(foundItem.distinguishingFeatures.toLowerCase())
-    ) {
-        score += 0.3;
-    }
-
-    return score;
-}
 
 // Route to get the history of reported lost and found items by user ID
 router.get('/history/:userId', async (req, res) => {
