@@ -62,6 +62,8 @@ router.get('/potentialMatches/:userId', async (req, res) => {
                         lostItem,
                         foundItem,
                         matchScore,
+                        lostItemUserId: lostItem.userId._id,  // Track both user IDs
+                        foundItemUserId: foundItem.userId._id,  // Track both user IDs
                         lostItemUserName: lostItem.userId.name,
                         foundItemUserName: foundItem.userId.name
                     });
@@ -78,6 +80,8 @@ router.get('/potentialMatches/:userId', async (req, res) => {
                         lostItem,
                         foundItem,
                         matchScore,
+                        lostItemUserId: lostItem.userId._id,  // Track both user IDs
+                        foundItemUserId: foundItem.userId._id,  // Track both user IDs
                         lostItemUserName: lostItem.userId.name,
                         foundItemUserName: foundItem.userId.name
                     });
